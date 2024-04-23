@@ -13,7 +13,7 @@ def main():
     kernel = np.ones((5, 5), np.uint8)
     img = cv2.dilate(img, kernel, iterations=1)
     img = cv2.erode(img, kernel, iterations=1)
-    img = cv2.bitwise_and(img,)
+    #img = cv2.bitwise_and(img,)
     cv2.imshow('img',img)
     cv2.waitKey(0)
     cv2.imwrite('images/img2_gray.jpg', img)

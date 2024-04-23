@@ -3,8 +3,8 @@ import numpy as np
 import pytesseract
 
 # Load the image
-img = cv2.imread("images/img1.jpg")
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files (x86)\Tesseract-OCR'
+img = cv2.imread("images/img10.jpg")
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'
 # Color-segmentation to get binary mask
 lwr = np.array([43, 0, 71])
 upr = np.array([103, 255, 130])
@@ -14,7 +14,9 @@ msk = cv2.inRange(hsv, lwr, upr)
 
 # Extract digits
 krn = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 3))
+
 dlt = cv2.dilate(msk, krn, iterations=5)
+
 res = 255 - cv2.bitwise_and(dlt, msk)
 
 
