@@ -2,26 +2,59 @@ import cv2
 import numpy as np
 import pytesseract
 
-# Load the image
-img = cv2.imread("images/img10.jpg")
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'
-# Color-segmentation to get binary mask
-lwr = np.array([43, 0, 71])
-upr = np.array([103, 255, 130])
-hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-msk = cv2.inRange(hsv, lwr, upr)
 
+img_color = cv2.imread("images/img17.jpg")
+img = cv2.cvtColor(img_color, cv2.COLOR_BGR2GRAY)
 
-# Extract digits
-krn = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 3))
+RATIO = img.shape[0] * 0.2
 
-dlt = cv2.dilate(msk, krn, iterations=5)
+#cv2.imshow('img',img)
+#cv2.waitKey(0)
 
-res = 255 - cv2.bitwise_and(dlt, msk)
+img = cv2.bilateralFilter(img, 5, 30, 60)
 
+trimmed = img[int(RATIO) :, int(RATIO) : img.shape[1] - int(RATIO)]
+img_color = img_color[int(RATIO) :, int(RATIO) : img.shape[1] - int(RATIO)]
 
-# Displaying digits and OCR
-txt = pytesseract.image_to_string(res, config="--psm 6 digits")
-print(''.join(t for t in txt if t.isalnum()))
-cv2.imshow("res", res)
+#cv2.imshow('Blurred and Trimmed',trimmed)
+#cv2.waitKey(0)
+
+edged = cv2.adaptiveThreshold(trimmed, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 5, 5)
+
+cv2.imshow("Edged", edged)
 cv2.waitKey(0)
+
+
+kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 5))
+dilated = cv2.dilate(edged, kernel, iterations=1)
+dilated = cv2.bitwise_not(dilated)
+
+cv2.imshow("Dilated", dilated)
+cv2.waitKey(0)
+
+txt = pytesseract.image_to_string(dilated, config='--psm 10 --oem 3 -c tessedit_char_whitelist=0123456789.')
+print(txt)
+
+dilated = cv2.bitwise_not(dilated)
+kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 1))
+dilated = cv2.dilate(dilated, kernel, iterations=1)
+dilated = cv2.bitwise_not(dilated)
+
+cv2.imshow("Dilated x2", dilated)
+cv2.waitKey(0)
+
+txt = pytesseract.image_to_string(dilated, config='--psm 10 --oem 3 -c tessedit_char_whitelist=0123456789.')
+
+print(txt)
+
+dilated = cv2.bitwise_not(dilated)
+kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2, 1),)
+eroded = cv2.erode(dilated, kernel, iterations=1)
+eroded = cv2.bitwise_not(eroded)
+
+#cv2.imshow("Eroded", eroded)
+#cv2.waitKey(0)
+
+txt = pytesseract.image_to_string(eroded, config='--psm 10 --oem 3 -c tessedit_char_whitelist=0123456789.')
+print(txt)
