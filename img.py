@@ -1,14 +1,24 @@
 from PIL import Image
 import os 
 
-files = os.listdir('dataset/Testing/white_mushroom')
+name = 'gruzdi'
+var = 'Training'
+
+os.getcwd()
+collection = f"dataset1/{var}/{name}"
+for i, filename in enumerate(os.listdir(collection)):
+    os.rename(f"dataset1/{var}/{name}/" + filename, f"dataset1/{var}/{name}/" + str(i) +str(i)+str(i)+ ".jpg")
+    
+
+for i, filename in enumerate(os.listdir(collection)):
+    os.rename(f"dataset1/{var}/{name}/" + filename, f"dataset1/{var}/{name}/" + str(i) + ".jpg")
+
+files = os.listdir(f'dataset1/{var}/{name}')
 
 for i in range(len(files)):
-    img = Image.open(f'dataset/Testing/white_mushroom/{str(i)}.jpg')
-    if img.format != 'JPEG':
+    img = Image.open(f'dataset1/{var}/{name}/{str(i)}.jpg')
+    if img.format != 'JPEG' and img.format != 'PNG':
         print(img.filename, img.format)
-
-#os.getcwd()
-#collection = "dataset/Training/white_mushroom"
-#for i, filename in enumerate(os.listdir(collection)):
-#    os.rename("dataset/Training/white_mushroom/" + filename, "dataset/Training/white_mushroom/" + str(i) + ".jpg")
+        img.close()
+        os.remove(f'dataset1/{var}/{name}/{str(i)}.jpg')
+        print('Удален')
